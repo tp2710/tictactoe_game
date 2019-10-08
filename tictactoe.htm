@@ -5,17 +5,26 @@
 </head>
 <title>ECOWORLD TESTING</title>
 
-<script type="text/javascript" src="tictactoe_helper.js"></script>
 <script type="text/javascript" src="tictactoe.js"></script>
 
 <script src="https://cdn.jsdelivr.net/gh/bestiejs/platform.js/platform.js"></script>
 
-<body onload="helper_check_student_source();">
+<body onload="load_page;">
 <h1 align=center>ECOWORLD TESTING</h1>
 
 <!-- Only one of the 3 following divs is shown at a time, depending on the state of the game -->
 <div id="ui_startgame">
 <h2>Set initial board:</h2>
+Select board:<select id="select-number-board" style="width:60px;">
+	<option value="3">3</option>
+	<option value="4">4</option>
+	<option value="5">5</option>
+	<option value="6">6</option>
+	<option value="7">7</option>
+	<option value="8">8</option>
+	<option value="9">9</option>
+	<option value="10">10</option>
+</select>
 <table style="border-collapse: collapse">
   <tr>
     <td style="border-bottom:2px solid"><button style="width:40px;height:20px" onclick="helper_initboard_click(0)" id="input_initboard_pos0"></button></td>

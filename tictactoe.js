@@ -64,8 +64,8 @@ function tictactoe_minimax(board,cpu_player,cur_player) {
   //Return results gathered from all sucessors (moves).
   //Which was the "best" move?  
   return {
-    move: /* What do you return here? */,
-    score: /* And here? */
+    //move: /* What do you return here? */,
+    //score: /* And here? */
   };
 }
 
@@ -111,6 +111,10 @@ function tictactoe_minimax_alphabeta(board,cpu_player,cur_player,alpha,beta) {
   *
   * Hint: Make sure you update the recursive function call to call this function!
   ***********************/
+}
+
+function load_page(){
+	
 }
 
 function debug(board,human_player) {
