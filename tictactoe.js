@@ -113,8 +113,43 @@ function tictactoe_minimax_alphabeta(board,cpu_player,cur_player,alpha,beta) {
   ***********************/
 }
 
+function createTable() {
+  var dem = 0;
+  var numberOfNodes = document.getElementById("select-number-board").value;
+  var theTable = document.getElementById("myDivTable");
+  var createdTable = document.createElement("table");
+  createdTable.setAttribute("style", "border-collapse: collapse");
+  var tabBody = document.createElement("tbody");
+  createdTable.appendChild(tabBody);
+  for (var i = 0; i < numberOfNodes; i++) {
+   var myRow = document.createElement("tr");
+   tabBody.appendChild(myRow);
+   for (var j = 0; j < numberOfNodes; j++) {
+    var myCol = document.createElement("td");	
+	if (j == 0){
+		myCol.setAttribute("style","border-bottom:2px solid");
+	} else {
+		myCol.setAttribute("style","border-left:2px solid;border-bottom:2px solid");
+    }
+    var myButton = document.createElement("button");
+    myButton.setAttribute("id","input_initboard_pos"+dem);
+	myButton.setAttribute("style","width:40px;height:20px");
+	myButton.setAttribute("onclick","initboard_click(" + dem + ")");
+	myButton.disabled = true;
+    myCol.appendChild(myButton);
+    myRow.appendChild(myCol);
+	dem++;
+   }
+  }
+  theTable.appendChild(createdTable);
+}
+ 
 function load_page(){
-	
+	createTable();
+}
+
+
+function initboard_click(pos){
 }
 
 function debug(board,human_player) {
