@@ -149,6 +149,49 @@ function load_page(){
 }
 
 
+function setStateForControl(state){
+	let selectNumberBoard=document.getElementById("select-number-board");
+	let inputOrderX=document.getElementById("input_order_X");
+	let inputOrderO=document.getElementById("input_order_O");
+	let inputCPUModeMM=document.getElementById("input_cpumode_mm");
+	let inputCPUModeMMAB=document.getElementById("input_cpumode_mmab");
+	selectNumberBoard.disabled = state;
+	inputOrderX.disabled = state;
+	inputOrderO.disabled = state;
+	inputCPUModeMM.disabled = state;
+	inputCPUModeMMAB.disabled = state;
+}
+
+function clearBoard(state) {
+	var numberOfNodes = document.getElementById("select-number-board").value;
+	var dem =0;
+	for (var i = 0; i < numberOfNodes; i++) {
+		for (var j = 0; j < numberOfNodes; j++) {
+			let input=document.getElementById("input_initboard_pos"+dem);
+			input.innerHTML = "";
+			input.disabled = state;
+			dem++;
+		}
+	}
+}
+
+function game_start(){
+	let button=document.getElementById("btnStart");
+	
+	if(button.innerText === "Start Game") {
+		var theTable = document.getElementById("myDivTable");
+		theTable.innerHTML = "";
+		createTable();
+		setStateForControl(true);
+		clearBoard(false);
+		button.innerText = "Restart Game";
+	} else {
+		setStateForControl(false);
+		clearBoard(true);
+		button.innerText = "Start Game";
+	}
+}
+
 function initboard_click(pos){
 }
 

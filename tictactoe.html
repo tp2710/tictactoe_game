@@ -24,6 +24,8 @@ Select board:<select id="select-number-board" style="width:60px;">
 	<option value="8">8</option>
 	<option value="9">9</option>
 	<option value="10">10</option>
+	<option value="50">50</option>
+	<option value="100">100</option>
 </select>
 <div id="myDivTable"></div>
 <br>
@@ -55,7 +57,7 @@ CPU mode is:
 <input type="radio" id="input_cpumode_mm" name="input_cpumode" checked="checked">MiniMax
 <input type="radio" id="input_cpumode_mmab" name="input_cpumode">MiniMax w/ Alpha-Beta Pruning
 <br>
-<button onclick="game_start()">Start Game</button>
+<button onclick="game_start()" id="btnStart">Start Game</button>
 <button onclick="do_debug()">Run debug function</button>
 </div>
 
