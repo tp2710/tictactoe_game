@@ -114,7 +114,6 @@ function tictactoe_minimax_alphabeta(board,cpu_player,cur_player,alpha,beta) {
 }
 
 function createTable() {
-  var dem = 0;
   var numberOfNodes = document.getElementById("select-number-board").value;
   var theTable = document.getElementById("myDivTable");
   var createdTable = document.createElement("table");
@@ -132,13 +131,12 @@ function createTable() {
 		myCol.setAttribute("style","border-left:2px solid;border-bottom:2px solid");
     }
     var myButton = document.createElement("button");
-    myButton.setAttribute("id","input_initboard_pos"+dem);
+    myButton.setAttribute("id",i+''+j);
 	myButton.setAttribute("style","width:40px;height:20px");
-	myButton.setAttribute("onclick","initboard_click(" + dem + ")");
+	myButton.setAttribute("onclick","clickedCell(this)");
 	myButton.disabled = true;
     myCol.appendChild(myButton);
     myRow.appendChild(myCol);
-	dem++;
    }
   }
   theTable.appendChild(createdTable);
@@ -164,13 +162,11 @@ function setStateForControl(state){
 
 function clearBoard(state) {
 	var numberOfNodes = document.getElementById("select-number-board").value;
-	var dem =0;
 	for (var i = 0; i < numberOfNodes; i++) {
 		for (var j = 0; j < numberOfNodes; j++) {
-			let input=document.getElementById("input_initboard_pos"+dem);
+			let input=document.getElementById(i+''+j);
 			input.innerHTML = "";
 			input.disabled = state;
-			dem++;
 		}
 	}
 }
@@ -192,7 +188,7 @@ function game_start(){
 	}
 }
 
-function initboard_click(pos){
+function clickedCell(cell) {
 }
 
 function debug(board,human_player) {
