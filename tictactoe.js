@@ -1,83 +1,47 @@
 //Define the order in which to examine/expand possible moves
 //(This affects alpha-beta pruning performance)
 let move_expand_order=[0,1,2,3,4,5,6,7,8]; //Naive (linear) ordering
+let board = null;
+let HUMAN = 1;
+let COMP = -1;
+let helper_eval_state_count = 0;
 //let move_expand_order=[4,0,1,2,3,5,6,7,8]; //Better ordering?
 
 /////////////////////////////////////////////////////////////////////////////
+/* Function to heuristic evaluation of state. */
+function evalute(state) {
+	var score = 0;
 
-function tictactoe_minimax(board,cpu_player,cur_player) {
-  /***********************************************************
-  * board: game state, an array representing a tic-tac-toe board
-  * The positions correspond as follows
-  * 0|1|2
-  * -+-+-
-  * 3|4|5 -> [ 0,1,2,3,4,5,6,7,8 ]
-  * -+-+-
-  * 6|7|8
-  * For each board location, use the following:
-  *  -1 if this space is blank
-  *   0 if it is X
-  *   1 if it is O
-  *
-  * cpu_player: Which piece is the computer designated to play
-  * cur_player: Which piece is currently playing
-  *   0 if it is X
-  *   1 if it is O
-  * So, to check if we are currently looking at the computer's
-  * moves do: if(cur_player===cpu_player)
-  *
-  * Returns: Javascript object with 2 members:
-  *   score: The best score that can be gotten from the provided game state
-  *   move: The move (location on board) to get that score
-  ***********************************************************/
+	if (gameOver(state, COMP)) {
+		score = +1;
+	}
+	else if (gameOver(state, HUMAN)) {
+		score = -1;
+	} else {
+		score = 0;
+	}
 
-  //BASE CASE
-  if(is_terminal(board)) //Stop if game is over
-    return {
-      move:null,
-      score:utility(board,cpu_player) //How good was this result for us?
-    }
+	return score;
+}
 
-  ++helper_expand_state_count; //DO NOT REMOVE
-  //GENERATE SUCCESSORS
-  for(let move of move_expand_order) { //For each possible move (i.e., action)
-    if(board[move]!=-1) continue; //Already taken, can't move here (i.e., successor not valid)
-    
-    let new_board=board.slice(0); //Copy
-    new_board[move]=cur_player; //Apply move
-    //Successor state: new_board
-
-    //RECURSION
-    // What will my opponent do if I make this move?
-    let results=tictactoe_minimax(new_board,cpu_player,1-cur_player);
-
-    //MINIMAX
-    /***********************
-    * TASK: Implement minimax here. (What do you do with results.move and results.score ?)
-    * 
-    * Hint: You will need a little code outside the loop as well, but the main work goes here.
-    *
-    * Hint: Should you find yourself in need of a very large number, try Infinity or -Infinity
-    ***********************/
-  }
-
-  //Return results gathered from all sucessors (moves).
-  //Which was the "best" move?  
-  return {
-    //move: /* What do you return here? */,
-    //score: /* And here? */
-  };
+/* This function tests if a specific player wins */
+function gameOver(state, player) {
+	var numberOfNodes = document.getElementById("select-number-board").value;
+	for (var i = 0; i < numberOfNodes; i++) {
+	var filled = 0;
+		for (var j = 0; j < numberOfNodes; j++) {
+			if (state[i][j] == player)
+				filled++;
+		}
+		if (filled == 3)
+			return true;
+	}
+	return false;
 }
 
 function is_terminal(board) {
   ++helper_eval_state_count; //DO NOT REMOVE
-  
-  /*************************
-  * TASK: Implement the terminal test
-  * Return true if the game is finished (i.e, a draw or someone has won)
-  * Return false if the game is incomplete
-  *************************/
-  return false;
+  return gameOver(board, HUMAN) || gameOver(board, COMP);
 }
 
 function utility(board,player) {
@@ -162,8 +126,11 @@ function setStateForControl(state){
 
 function clearBoard(state) {
 	var numberOfNodes = document.getElementById("select-number-board").value;
+    board = new Array(numberOfNodes);
 	for (var i = 0; i < numberOfNodes; i++) {
+	    board[i]=new Array(numberOfNodes)
 		for (var j = 0; j < numberOfNodes; j++) {
+		    board[i][j] = 0;
 			let input=document.getElementById(i+''+j);
 			input.innerHTML = "";
 			input.disabled = state;
@@ -181,14 +148,139 @@ function game_start(){
 		setStateForControl(true);
 		clearBoard(false);
 		button.innerText = "Restart Game";
+
+		var inputOrderX = document.getElementById("input_order_X").checked;
+		if (inputOrderX === false) {
+		    aiTurn();
+		}
 	} else {
 		setStateForControl(false);
 		clearBoard(true);
 		button.innerText = "Start Game";
 	}
 }
+function emptyCells(state) {
+	var cells = [];
+	var numberOfNodes = document.getElementById("select-number-board").value;
+	for (var x = 0; x < numberOfNodes; x++) {
+		for (var y = 0; y < numberOfNodes; y++) {
+			if (state[x][y] == 0)
+				cells.push([x, y]);
+		}
+	}
+
+	return cells;
+}
+
+/* A move is valid if the chosen cell is empty */
+function validMove(x, y) {
+	var empties = emptyCells(board);
+	try {
+		if (board[x][y] == 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	} catch (e) {
+		return false;
+	}
+}
+
+/* Set the move on board, if the coordinates are valid */
+function setMove(x, y, player) {
+	if (validMove(x, y)) {
+		board[x][y] = player;
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+/* *** AI function that choice the best move *** */
+function tictactoe_minimax(state, depth, player) {
+	var best;
+
+	if (player == COMP) {
+		best = [-1, -1, -1000];
+	}
+	else {
+		best = [-1, -1, +1000];
+	}
+
+	if (depth == 0 || is_terminal(state)) {
+		var score = evalute(state);
+		return [-1, -1, score];
+	}
+
+	emptyCells(state).forEach(function (cell) {
+		var x = cell[0];
+		var y = cell[1];
+		state[x][y] = player;
+		var score = tictactoe_minimax(state, depth - 1, -player);
+		state[x][y] = 0;
+		score[0] = x;
+		score[1] = y;
+
+		if (player == COMP) {
+			if (score[2] > best[2])
+				best = score;
+		}
+		else {
+			if (score[2] < best[2])
+				best = score;
+		}
+	});
+
+	return best;
+}
+
+/* It calls the minimax function */
+function aiTurn() {
+	var x, y;
+	var move;
+	var cell;
+	var numberOfNodes = document.getElementById("select-number-board").value;
+
+	if (emptyCells(board).length == numberOfNodes * numberOfNodes) {
+		x = parseInt(Math.random() * numberOfNodes);
+		y = parseInt(Math.random() * numberOfNodes);
+	}
+	else {
+		move = tictactoe_minimax(board, emptyCells(board).length, COMP);
+		x = move[0];
+		y = move[1];
+	}
+
+	if (setMove(x, y, COMP)) {
+		cell = document.getElementById(String(x) + String(y));
+		var inputOrderX = document.getElementById("input_order_X").checked;
+		if (inputOrderX === true) {
+		        cell.innerHTML = "O";
+		    } else {
+                cell.innerHTML = "X";
+		    }
+	}
+}
 
 function clickedCell(cell) {
+    var conditionToContinue = is_terminal(board) == false && emptyCells(board).length > 0;
+	if (conditionToContinue == true) {
+        var inputOrderX = document.getElementById("input_order_X").checked;
+        var x = cell.id.split("")[0];
+		var y = cell.id.split("")[1];
+		var move = setMove(x, y, HUMAN);
+		if (move == true) {
+		    if (inputOrderX === true) {
+		        cell.innerHTML = "X";
+		    } else {
+                cell.innerHTML = "O";
+		    }
+			if (conditionToContinue)
+				aiTurn();
+		}
+	}
 }
 
 function debug(board,human_player) {
