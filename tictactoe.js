@@ -5,6 +5,8 @@ let board = null;
 let HUMAN = 1;
 let COMP = -1;
 let helper_eval_state_count = 0;
+let rowHorizontal = -1;
+let rowVertical = -1;
 //let move_expand_order=[4,0,1,2,3,5,6,7,8]; //Better ordering?
 
 /////////////////////////////////////////////////////////////////////////////
@@ -23,19 +25,53 @@ function evalute(state) {
 
 	return score;
 }
-
 /* This function tests if a specific player wins */
 function gameOver(state, player) {
 	var numberOfNodes = document.getElementById("select-number-board").value;
-	for (var i = 0; i < numberOfNodes; i++) {
 	var filled = 0;
+	for (var i = 0; i < numberOfNodes; i++) {
+	    filled = 0;
 		for (var j = 0; j < numberOfNodes; j++) {
 			if (state[i][j] == player)
 				filled++;
 		}
-		if (filled == 3)
-			return true;
+		if (filled == numberOfNodes){
+		    return true;
+		}
 	}
+
+	for (var i = 0; i < numberOfNodes; i++) {
+	    filled = 0;
+		for (var j = 0; j < numberOfNodes; j++) {
+			if (state[j][i] == player)
+				filled++;
+		}
+		if (filled == numberOfNodes){
+		    return true;
+		}
+	}
+
+    filled = 0;
+    for (var i = 0; i < numberOfNodes; i++) {
+        if (state[i][i] == player) {
+            filled++;
+        }
+    }
+    if (filled == numberOfNodes)
+			return true;
+    filled = 0;
+    for (var i = 0; i < numberOfNodes; i++) {
+        for (var j = 0; j < numberOfNodes; j++) {
+            if  (i+j == numberOfNodes - 1) {
+                if (state[i][j] == player) {
+                    filled++;
+                }
+            }
+        }
+	}
+	if (filled == numberOfNodes)
+		return true;
+
 	return false;
 }
 
@@ -44,37 +80,19 @@ function is_terminal(board) {
   return gameOver(board, HUMAN) || gameOver(board, COMP);
 }
 
-function utility(board,player) {
-  /***********************
-  * TASK: Implement the utility function
-  *
-  * Return the utility score for a given board, with respect to the indicated player
-  *
-  * Give score of 0 if the board is a draw
-  * Give a positive score for wins, negative for losses.
-  * Give larger scores for winning quickly or losing slowly
-  * For example:
-  *   Give a large, positive score if the player had a fast win (i.e., 5 if it only took 5 moves to win)
-  *   Give a small, positive score if the player had a slow win (i.e., 1 if it took all 9 moves to win)
-  *   Give a small, negative score if the player had a slow loss (i.e., -1 if it took all 9 moves to lose)
-  *   Give a large, negative score if the player had a fast loss (i.e., -5 if it only took 5 moves to lose)
-  * (DO NOT simply hard code the above 4 values, other scores are possible. Calculate the score based on the above pattern.)
-  * (You may return either 0 or null if the game isn't finished, but this function should never be called in that case anyways.)
-  *
-  * Hint: You can find the number of turns by counting the number of non-blank spaces
-  *       (Or the number of turns remaining by counting blank spaces.)
-  ***********************/
-}
-
-function tictactoe_minimax_alphabeta(board,cpu_player,cur_player,alpha,beta) {
-  /***********************
-  * TASK: Implement Alpha-Beta Pruning
-  *
-  * Once you are confident in your minimax implementation, copy it here
-  * and add alpha-beta pruning. (What do you do with the new alpha and beta parameters/variables?)
-  *
-  * Hint: Make sure you update the recursive function call to call this function!
-  ***********************/
+function utility(board) {
+     var msg;
+     msg = document.getElementById("message");
+	 if (gameOver(board, COMP)) {
+		msg.innerHTML = "You lose!";
+        msg.style.color = "red";
+	} else if (gameOver(board, HUMAN)) {
+		msg.innerHTML = "You win!";
+		msg.style.color = "red";
+	} else  if (emptyCells(board).length == 0 && !is_terminal(board)) {
+		msg.innerHTML = "Draw!";
+	}
+	msg.style.fontSize = "xx-large";
 }
 
 function createTable() {
@@ -125,6 +143,8 @@ function setStateForControl(state){
 }
 
 function clearBoard(state) {
+    var msg = document.getElementById("message");
+    msg.innerHTML = "";
 	var numberOfNodes = document.getElementById("select-number-board").value;
     board = new Array(numberOfNodes);
 	for (var i = 0; i < numberOfNodes; i++) {
@@ -236,6 +256,17 @@ function tictactoe_minimax(state, depth, player) {
 	return best;
 }
 
+function tictactoe_minimax_alphabeta(board,cpu_player,cur_player,alpha,beta) {
+  /***********************
+  * TASK: Implement Alpha-Beta Pruning
+  *
+  * Once you are confident in your minimax implementation, copy it here
+  * and add alpha-beta pruning. (What do you do with the new alpha and beta parameters/variables?)
+  *
+  * Hint: Make sure you update the recursive function call to call this function!
+  ***********************/
+}
+
 /* It calls the minimax function */
 function aiTurn() {
 	var x, y;
@@ -271,7 +302,8 @@ function clickedCell(cell) {
         var x = cell.id.split("")[0];
 		var y = cell.id.split("")[1];
 		var move = setMove(x, y, HUMAN);
-		if (move == true) {
+		var isHumanWin = gameOver(board, HUMAN);
+		if (move == true && !isHumanWin) {
 		    if (inputOrderX === true) {
 		        cell.innerHTML = "X";
 		    } else {
@@ -281,6 +313,7 @@ function clickedCell(cell) {
 				aiTurn();
 		}
 	}
+	utility(board);
 }
 
 function debug(board,human_player) {
